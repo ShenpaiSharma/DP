@@ -1,41 +1,44 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int dp[100][100];
-int vis[100][100];
+int dp[1000][1000];
+bool visit[1000][1000];
 
-int GoldMine(int m,int n,int Gold[3][3]){
-    if(n >= 2){
-        return Gold[m][n];
+int fun(int Gold[][1000],int n,int m,int i,int j){
+    if(j>=m-1){
+        return Gold[i][j];
     }
-    if(vis[m][n] == 1){
-        return dp[m][n];
+    if(visit[i][j]){
+        return dp[i][j];
     }
-    int sum = Gold[m][n] + GoldMine(m,n+1,Gold);
-    if(m < 3){
-        sum = max(sum,Gold[m][n]+GoldMine(m+1,n+1,Gold));
+    int ans = Gold[i][j] + fun(Gold,n,m,i,j+1);
+    if(i < n-1){
+        ans = max(ans,Gold[i][j]+fun(Gold,n,m,i+1,j+1));
     }
-    if(m >= 0){
-        sum = max(sum,Gold[m][n] + GoldMine(m-1,n+1,Gold));
+    if(i > 0){
+        ans = max(ans,Gold[i][j]+fun(Gold,n,m,i-1,j+1));
     }
-    dp[m][n] = sum;
-    vis[m][n] = 1;
-    return dp[m][n];
+    dp[i][j] = ans;
+    visit[i][j] = true;
+    return dp[i][j];
 }
 
 int main() {
-	int Gold[3][3];
-	int m,n,x;
-	cin>>m>>n;
-	for(int i=0;i<m;i++){
-	    for(int j=0;j<n;j++){
+	int n,m;
+	cin>>n>>m;
+	int Gold[1000][1000];
+	for(int i=0;i<n;i++){
+	    for(int j=0;j<m;j++){
 	        cin>>Gold[i][j];
 	    }
 	}
-	int res = GoldMine(0,0,Gold);
-	for(int i=1;i<3;i++){
-	    res = max(res,GoldMine(i,0,Gold));
+	memset(visit,false,sizeof(visit));
+	memset(dp,0,sizeof(visit));
+	int res = 0;
+	for(int i=0;i<n;i++){
+	    res = max(res,fun(Gold,m,n,i,0));
 	}
 	cout<<res;
 	return 0;
 }
+
